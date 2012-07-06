@@ -1,17 +1,23 @@
 <?php
 /*
-xMail core server
+ * xMail core server
+ * 
+ * Here is where everything is passed in from the plugin.
+ */
 
-Here is where everything is passed in from the plugin.
-*/
+// includes
+require_once "includes/constants.inc.php";
+require_once "includes/ConfigHandler.inc.php";
+require_once "includes/misc.inc.php";
+require_once "includes/keys.inc.php";
+
+// Construct some classes before we get moving
+$config = configHandler::singleton();
 
 // You will need to change these values, most likely
-mysql_connect("localhost", "xMailUsername", "xMailPassword") or die(mysql_error());
-mysql_select_db("xMailDatabase") or die(mysql_error());
+mysql_connect($config->get("mysql.server"), $config->get("mysql.username"), $config->get("mysql.password")) or die(mysql_error());
+mysql_select_db($config->get("mysql.database")) or die(mysql_error());
 
-// Include the required classes
-include "misc.php";
-include "keys.php";
 
 // Passed in from the plugin (POST)
 $mode = clean($_POST['mode']); // Mode selection
