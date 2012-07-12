@@ -102,7 +102,8 @@ if(!valid($mode)){ // Check for "invalid" setting of the mode
 			if(mysql_num_rows($query)==1){
 				echo json_encode(array("message" => "Username in use", "status" => "ERROR"));
 			}else{
-				mysql_query("INSERT INTO users (username, password, loggedin, lastlogin) VALUES ('$username', '$password', '1', '$now')") or die(mysql_error());
+				$key = sha1($now);
+				mysql_query("INSERT INTO users (username, password, loggedin, lastlogin, apikey) VALUES ('$username', '$password', '1', '$now', '$key')") or die(mysql_error());
 				$key = get_key($ip, $mode, $username);
 				echo json_encode(array("message" => "User registered", "status" => "OK", "username" => $username, "date" => $now, "loggedin" => true, "lastlogin" => $now, "apikey" => $key));
 			}
