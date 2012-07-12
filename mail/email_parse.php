@@ -20,6 +20,12 @@ mysql_select_db($config->get("mysql.database")) or die(mysql_error());
 $email = file_get_contents('php://stdin');
 preg_match_all("/(.*):\s(.*)\n/i", $email, $matches);
 
+// You may have to change these settings due to domain changes.
+// To see if they need changing, uncomment the following line:
+// mail("YOUREMAILHERE", "xMail PHP server dump", print_r($matches, true));
+// Look under the [2] index for the required indexes after sending an email through
+// the script.
+
 $sender 	= $matches[2][10]; 					// whoever@xmail.turt2live.com
 $sender_ID	= explode('@', $sender);			// Raw from (assuming SomeName <SomeEmail@domain.ext>)
 $sender_ID	= explode(" <", $sender_ID[0]);		// Split on < (just in case)
