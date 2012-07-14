@@ -4,18 +4,15 @@
 This file is to be used if you want to setup email piping for xMail.
 */
 
-// Includes
+// includes
 require_once "includes/constants.inc.php";
-require_once "includes/ConfigHandler.inc.php";
+require_once XMAIL_CONF_PATH;
 require_once "includes/misc.inc.php";
 require_once "includes/keys.inc.php";
 
-// Construct some classes before we get moving
-$config = configHandler::singleton();
-
 // You will need to change these values, most likely
-mysql_connect($config->get("mysql.server"), $config->get("mysql.username"), $config->get("mysql.password")) or die(mysql_error());
-mysql_select_db($config->get("mysql.database")) or die(mysql_error());
+mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
+mysql_select_db($config["mysql.database"]) or die(mysql_error());
 
 $email = file_get_contents('php://stdin');
 preg_match_all("/(.*):\s(.*)\n/i", $email, $matches);
@@ -55,7 +52,6 @@ if(empty($subject) === true || empty($message) === true || empty($id) === true){
 }
 
 function checkID($id){
-	mail("travpc@gmail.com", "sadasda", strlen($id)."");
 	if(strlen($id)<5){
 		return null;
 	}
