@@ -15,6 +15,30 @@ require_once "includes/keys.inc.php";
 mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
 mysql_select_db($config["mysql.database"]) or die(mysql_error());
 
+// Used later in the script.
+// This returns TRUE if the version is supported, FALSE otherwise
+function versionCheck($version){
+	$versions = array("1.0.0", "1.1.0", "IRC");
+	$ip = $_SERVER['REMOTE_ADDR'];
+	// Check if the version is supported, or is a DEV version (chances are the client
+	// is not a dev version, and most dev versions will support any "official" server)
+	// If for whatever the client uses a DEV version, and it's not supported, they can use
+	// the INFO mode to see the server version.
+	if(in_array($version, $versions) || endsWith($version, "-DEV"){
+		return valid($version); // Secondary check
+	}
+	return false;
+}
+
+// Used by version check, code copied from
+// http://stackoverflow.com/questions/834303/php-startswith-and-endswith-functions
+function endsWith($haystack, $needle){
+    $length = strlen($needle);
+    if ($length == 0) {
+        return true;
+    }
+    return (substr($haystack, -$length) === $needle);
+}
 
 // Passed in from the plugin (POST)
 $mode = clean($_POST['mode']); // Mode selection
@@ -22,7 +46,10 @@ $key = clean($_POST['apikey']); // API Key (if needed)
 $ip = $_SERVER['REMOTE_ADDR']; // IP, for internal use
 $version = clean($_POST['version']); // Version, just in case
 $now = time(); // Used internally 
-if(!valid($mode)){ // Check for "invalid" setting of the mode
+
+if(!versionCheck($version)){ // Version checking
+	echo json_encode(array("message" => "Invalid Version", "status" => "ERROR", "sentVersion" => $version));
+}else if(!valid($mode)){ // Check for "invalid" setting of the mode
 	// NOTE: All of xMail is JSON based
 	echo json_encode(array("message" => "Invalid Mode", "status" => "ERROR"));
 }else{	
@@ -150,6 +177,11 @@ if(!valid($mode)){ // Check for "invalid" setting of the mode
 				$last = mysql_result($query, 0, "lastlogin");
 				mysql_query("UPDATE users SET loggedin='1', lastlogin='$now' WHERE username='$username' LIMIT 1") or die(mysql_error());
 				$key = get_key($ip, $mode, $username);
+				/*
+				============================= CRITICAL =============================
+				  xMail ignores the REAL logged in value of the user here!! FIX!!
+				============================= CRITICAL =============================				
+				*/
 				echo json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $last, "apikey" => $key));
 			}else{
 				echo json_encode(array("message" => "Incorrect username or password", "status" => "ERROR", "username" => $username, "loggedin" => false));
@@ -178,6 +210,7 @@ if(!valid($mode)){ // Check for "invalid" setting of the mode
 						$attachments = $array['attachments'];
 						$complex = $array['complex'];
 						$id = $array['id'];
+						$unread = $array['unread'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -194,6 +227,7 @@ if(!valid($mode)){ // Check for "invalid" setting of the mode
 						$mailMess["message"] = $message;
 						$mailMess["complex"] = $complex;
 						$mailMess["attachments"] = $attachments;
+						$mailMess["unread"] = $unread;
 						echo "\n".json_encode($mailMess);
 						/*
 						The new line is required because the plugin reads the first line as
@@ -210,6 +244,125 @@ if(!valid($mode)){ // Check for "invalid" setting of the mode
 		}else{
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
+	}else if($mode == "SENT"){
+		// Fetches the sent mail from a user
+		$username = clean($_POST['username']);
+		// Check API key
+		check_key($ip, $mode, $key, $username);
+		if(valid($username)){
+			// Check login
+			$query = mysql_query("SELECT id FROM users WHERE username='$username' AND loggedin='1'") or die(mysql_error());
+			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){ // Verify
+				$query = mysql_query("SELECT * FROM `mail` WHERE `from`='$username'") or die(mysql_error());
+				if(mysql_num_rows($query)>0){
+					// Spit out basic details
+					echo json_encode(array("message" => "sent", "status" => "OK", "username" => $username, "messages" => mysql_num_rows($query)));
+					while($array = mysql_fetch_array($query)){
+						// Gather information
+						$to = $array['to'];
+						$from = $array['from'];
+						$message = $array['message'];
+						$attachments = $array['attachments'];
+						$complex = $array['complex'];
+						$id = $array['id'];
+						$unread = $array['unread'];
+						
+						// Make "plugin-readable" variables
+						if($complex == 1){
+							$complex = true;
+						}else{
+							$complex = false;
+						}
+						
+						// Generate
+						$mailMess = array();
+						$mailMess["id"] = $id;
+						$mailMess["to"] = $to;
+						$mailMess["from"] = $from;
+						$mailMess["message"] = $message;
+						$mailMess["complex"] = $complex;
+						$mailMess["attachments"] = $attachments;
+						$mailMess["unread"] = $unread;
+						echo "\n".json_encode($mailMess);
+						/*
+						The new line is required because the plugin reads the first line as
+						the "basic info" line and any lines afterwards as "mail".
+						*/
+					}
+				}else{
+					// No mail
+					echo json_encode(array("message" => "no mail", "status" => "OK"));
+				}
+			}else{
+				echo json_encode(array("message" => "Incorrect username or password", "status" => "ERROR", "username" => $username, "loggedin" => false));
+			}
+		}else{
+			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
+		}
+	}else if($mode == "READ"){
+		// Fetches the read mail of a user
+		$username = clean($_POST['username']);
+		// Check API key
+		check_key($ip, $mode, $key, $username);
+		if(valid($username)){
+			// Check login
+			$query = mysql_query("SELECT id FROM users WHERE username='$username' AND loggedin='1'") or die(mysql_error());
+			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){ // Verify
+				$query = mysql_query("SELECT * FROM `mail` WHERE `to`='$username' AND `unread`='0'") or die(mysql_error());
+				if(mysql_num_rows($query)>0){
+					// Spit out basic details
+					echo json_encode(array("message" => "read", "status" => "OK", "username" => $username, "read" => mysql_num_rows($query)));
+					while($array = mysql_fetch_array($query)){
+						// Gather information
+						$to = $array['to'];
+						$from = $array['from'];
+						$message = $array['message'];
+						$attachments = $array['attachments'];
+						$complex = $array['complex'];
+						$id = $array['id'];
+						$unread = $array['unread'];
+						
+						// Make "plugin-readable" variables
+						if($complex == 1){
+							$complex = true;
+						}else{
+							$complex = false;
+						}
+						
+						// Generate
+						$mailMess = array();
+						$mailMess["id"] = $id;
+						$mailMess["to"] = $to;
+						$mailMess["from"] = $from;
+						$mailMess["message"] = $message;
+						$mailMess["complex"] = $complex;
+						$mailMess["attachments"] = $attachments;
+						$mailMess["unread"] = $unread;
+						echo "\n".json_encode($mailMess);
+						/*
+						The new line is required because the plugin reads the first line as
+						the "basic info" line and any lines afterwards as "mail".
+						*/
+					}
+				}else{
+					// No mail
+					echo json_encode(array("message" => "no mail", "status" => "OK"));
+				}
+			}else{
+				echo json_encode(array("message" => "Incorrect username or password", "status" => "ERROR", "username" => $username, "loggedin" => false));
+			}
+		}else{
+			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
+		}
+	}else if($mode == "INFO"){
+		// Can be used to gather information about the server.
+		// message = server type 
+		// status = must be 'OK'
+		// version = the server version
+		// posturl = this page (almost useless)
+		// ip = the connecting IP
+		// now = the current server time, in seconds. See time() in the PHP manual for more info
+		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => XMAIL_SERVER_VERSION, "posturl" => $config["server.posturl"], "ip" => $ip, "now" => $now));
 	}else{
 		echo json_encode(array("message" => "Invalid Mode", "status" => "ERROR"));
 	}
