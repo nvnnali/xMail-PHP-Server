@@ -30,7 +30,7 @@ CREATE TABLE IF NOT EXISTS `banned` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ip` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `import_keys` (
   `key` text NOT NULL,
   `ip` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2883 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -59,7 +59,7 @@ CREATE TABLE IF NOT EXISTS `keys` (
   `ip` text NOT NULL,
   `expire` int(45) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5921 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -74,7 +74,7 @@ CREATE TABLE IF NOT EXISTS `log` (
   `variables` text NOT NULL,
   `time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1613937 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `unread` tinyint(1) NOT NULL,
   `sent_from` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=5177 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS `serversessions` (
   `ip` text NOT NULL,
   `loggedin` int(11) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=2 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -124,7 +124,7 @@ CREATE TABLE IF NOT EXISTS `session` (
   `sid` text NOT NULL,
   `expires` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=37 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -140,7 +140,7 @@ CREATE TABLE IF NOT EXISTS `snmail` (
   `send` int(60) NOT NULL,
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`uid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=4 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS `snmail2` (
   `lines` text NOT NULL,
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   PRIMARY KEY (`uid`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=55 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -169,7 +169,7 @@ CREATE TABLE IF NOT EXISTS `stats` (
   `value` text NOT NULL,
   `time` text NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=962020 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 -- --------------------------------------------------------
 
@@ -187,7 +187,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `loggedin` tinyint(1) NOT NULL,
   `searchexempt` int(11) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=212 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
