@@ -22,6 +22,10 @@ function dirty($input){
 	//}
 	//$input = mysql_real_escape_string($input);
 	$input = html_entity_decode($input, ENT_COMPAT, "UTF-8");
+	$input = htmlspecialchars_decode($input, ENT_COMPAT);
+	if(get_magic_quotes_gpc()){
+		$input = stripslashes($input);
+	}
 	return $input;
 }
 ?>

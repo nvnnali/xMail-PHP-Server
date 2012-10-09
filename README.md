@@ -14,3 +14,5 @@ the best we can.
 The xMail PHP server is not backed by a whole lot of PHP knowledge, so the code is likely "bad" in that sense. 
 
 See "xMail.sql" for the SQL schema.
+
+In /cron you will find 2 PHP scrips to be run to help xMail function.

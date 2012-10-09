@@ -1,0 +1,1 @@
+Some of these files are not used by the server, but are here to help with interfacing the server with a website.

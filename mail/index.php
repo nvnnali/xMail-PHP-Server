@@ -1,107 +1,114 @@
 <?php
-/*
- * xMail core server
- * 
- * Here is where everything is passed in from the plugin.
- */
-
 // includes
 require_once "includes/constants.inc.php";
 require_once XMAIL_CONF_PATH;
 require_once "includes/misc.inc.php";
 require_once "includes/keys.inc.php";
+require_once "includes/spamfilter.inc.php";
+require_once "../api/misc.inc.php";
+require_once "../inc/user.php";
 
 // You will need to change these values, most likely
 mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
 mysql_select_db($config["mysql.database"]) or die(mysql_error());
 
-// Used later in the script.
-// This returns TRUE if the version is supported, FALSE otherwise
 function versionCheck($version){
-	$versions = array("1.0.0", "1.1.0", "IRC");
+	$versions = array("1.0.0", "1.1.0", "1.1.1", "1.2.0-DEV", "IRC", "DesktopAPI");
 	$ip = $_SERVER['REMOTE_ADDR'];
-	// Check if the version is supported, or is a DEV version (chances are the client
-	// is not a dev version, and most dev versions will support any "official" server)
-	// If for whatever the client uses a DEV version, and it's not supported, they can use
-	// the INFO mode to see the server version.
-	if(in_array($version, $versions) || endsWith($version, "-DEV"){
-		return valid($version); // Secondary check
+	if(in_array($version, $versions) || $ip == "68.151.211.33"){
+		return valid($version); 
 	}
 	return false;
 }
 
-// Used by version check, code copied from
-// http://stackoverflow.com/questions/834303/php-startswith-and-endswith-functions
-function endsWith($haystack, $needle){
-    $length = strlen($needle);
-    if ($length == 0) {
-        return true;
-    }
-    return (substr($haystack, -$length) === $needle);
+$mode = clean($_POST['mode']);
+$key = clean($_POST['apikey']);
+$ip = $_SERVER['REMOTE_ADDR'];
+$version = clean($_POST['version']);
+$now = time();
+$debug = valid($_POST['debug']);
+$online = clean($_POST['onlineMode']);
+$isOnlineMode = false;
+
+if(valid($online)){
+	if($online == "online"){
+		$isOnlineMode = true;
+	}
 }
 
-// Passed in from the plugin (POST)
-$mode = clean($_POST['mode']); // Mode selection
-$key = clean($_POST['apikey']); // API Key (if needed)
-$ip = $_SERVER['REMOTE_ADDR']; // IP, for internal use
-$version = clean($_POST['version']); // Version, just in case
-$now = time(); // Used internally 
+$vars = print_r($_REQUEST, true);
+$page = __FILE__;
+mysql_query("INSERT INTO `log` (`ip`, `page`, `variables`) VALUES ('$ip', '$page', '$vars')") or die(mysql_error());
 
-if(!versionCheck($version)){ // Version checking
+if(mysql_num_rows(mysql_query("SELECT id FROM `banned` WHERE `ip`='$ip'"))>0){
+	die(json_encode(array("message" => "IP Ban", "status" => "ERROR", "ip" => $ip)));
+}
+
+if(!versionCheck($version)){
 	echo json_encode(array("message" => "Invalid Version", "status" => "ERROR", "sentVersion" => $version));
-}else if(!valid($mode)){ // Check for "invalid" setting of the mode
-	// NOTE: All of xMail is JSON based
+}else if(!valid($mode)){
 	echo json_encode(array("message" => "Invalid Mode", "status" => "ERROR"));
 }else{	
-	// Special case for importing from another mail plugin
-	// The server sends back a ONE TIME use key
 	if($mode == "IMPORT_KEY"){
 		$key = sha1("import".time());
-		mysql_query("INSERT INTO `import_keys` (`key`, `ip`) VALUES ('$key', '$ip')") or die(mysql_error());
+		if(!$debug){
+			mysql_query("INSERT INTO `import_keys` (`key`, `ip`) VALUES ('$key', '$ip')") or die(mysql_error());
+		}
 		die(json_encode(array("message" => $key, "status" => "OK")));
 	}
-	// Send Mail
 	if($mode == "SEND"){
-		// All variables are cleaned before use
-		$pid = clean($_POST['pid']); // "Post ID", aka: Message ID (not used)
-		$uid = clean($_POST['uid']); // Unique ID (not used)
-		$ident = clean($_POST['ident']); // Message identity, can be "S" for simple or "C" for complex
-		$to = clean($_POST['to']); // Send to
-		$from = clean($_POST['from']); // Sent from
-		$message = clean($_POST['message']); // Message contents
-		$attachments = ""; // Default blank
+		$pid = clean($_POST['pid']);
+		$uid = clean($_POST['uid']);
+		$ident = clean($_POST['ident']);
+		$to = clean($_POST['to']);
+		$from = clean($_POST['from']);
+		$message = clean($_POST['message']);
+		$attachments = "";
 		// Check API key
-		check_key($ip, $mode, $key, $from); // Will kill the connection if invalid
+		check_key($ip, $mode, $key, $from);
 		if(valid($pid) && valid($uid) && valid($ident) && valid($to) && valid($from) && valid($message)){
-			if($ident == "S"){
-				// Simple mail: Just insert and tell the plugin we're good
-				mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `sent`) VALUES ('$to', '$from', '$message', '1', '0', '$now')") or die(mysql_error());
-				echo json_encode(array("message" => "Message sent!", "status" => "OK"));
-			}else if($ident == "C"){
-				// Complex mail: Remove attachments from message, and insert
-				$message = str_replace("&amp;", "&", $message); // Rebuild message
-				$parts = explode(";", $message); // Split out attachments, this needs to be safer (TODO)
-				$message = $parts[0]; // Message
-				$attachments = ""; 
-				// Rebuild attachments
-				for($i=1;$i<count($parts);$i++){
-					$attachments .= $parts[$i].";";
+			if(userExists($to)){
+				if($ident == "S"){
+					if(!isSpam($to, $from, $message)){
+						if(!$debug){
+							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `sent`, `sent_from`) VALUES ('$to', '$from', '$message', '1', '0', '$now', '$ip')") or die(mysql_error());
+						}
+						onSend($to, $from, $message);
+						echo json_encode(array("message" => "Message sent!", "status" => "OK"));
+					}else{
+						echo json_encode(array("message" => "Spam", "status" => "ERROR"));
+					}
+				}else if($ident == "C"){
+					$message = str_replace("&amp;", "&", $message);
+					$parts = explode(";", $message);
+					$message = $parts[0];
+					$attachments = "";
+					for($i=1;$i<count($parts);$i++){
+						$attachments .= $parts[$i].";";
+					}
+					if(!isSpam($to, $from, $message)){
+						if(!$debug){
+							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `attachments`, `sent`) VALUES ('$to', '$from', '$message', '1', '1', '$attachments', '$now')") or die(mysql_error());
+						}
+						onComplexSend($to, $from, $message);
+						echo json_encode(array("message" => "Message sent!", "status" => "OK"));
+					}else{
+						echo json_encode(array("message" => "Spam", "status" => "ERROR"));
+					}
+				}else{
+					echo json_encode(array("message" => "Unknown ident", "status" => "ERROR"));
 				}
-				// Insert and return
-				mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `attachments`, `sent`) VALUES ('$to', '$from', '$message', '1', '1', '$attachments', '$now')") or die(mysql_error());
-				echo json_encode(array("message" => "Message sent!", "status" => "OK"));
 			}else{
-				echo json_encode(array("message" => "Unknown ident", "status" => "ERROR"));
+				echo json_encode(array("message" => "User does not exist", "status" => "ERROR", "missingUsername" => $to));
 			}
 		}else{
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "MARK"){
-		// Mark mail as read or unread
-		$read = clean($_POST['read']); // Read state
-		$pid = clean($_POST['pid']); // Post ID
-		$uid = clean($_POST['uid']); // Unique ID (not used)
-		$from = clean($_POST['username']); // not used
+		$read = clean($_POST['read']);
+		$pid = clean($_POST['pid']);
+		$uid = clean($_POST['uid']);
+		$from = clean($_POST['username']);
 		// Check API key
 		check_key($ip, $mode, $key, $from);
 		if(valid($read) && valid($pid) && valid($uid)){
@@ -111,14 +118,14 @@ if(!versionCheck($version)){ // Version checking
 			}else{
 				$read = 1;
 			}
-			// Update and alert plugin
-			mysql_query("UPDATE mail SET unread='$read' WHERE id='$pid' LIMIT 1") or die(mysql_error());
+			if(!$debug){
+				mysql_query("UPDATE mail SET unread='$read' WHERE id='$pid' LIMIT 1") or die(mysql_error());
+			}
 			echo json_encode(array("message" => "Updated Message", "status" => "OK"));
 		}else{
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "REGISTER"){
-		// Registers a new user
 		$username = clean($_POST['username']);
 		$password = clean($_POST['password']); // Encoded by plugin
 		if(valid($username) && valid($password)){
@@ -126,8 +133,12 @@ if(!versionCheck($version)){ // Version checking
 			if(mysql_num_rows($query)==1){
 				echo json_encode(array("message" => "Username in use", "status" => "ERROR"));
 			}else{
-				$key = sha1($now);
-				mysql_query("INSERT INTO users (username, password, loggedin, lastlogin, apikey) VALUES ('$username', '$password', '1', '$now', '$key')") or die(mysql_error());
+				if(!$debug){
+					$key = genAPIKey();
+					mysql_query("INSERT INTO users (username, password, loggedin, lastlogin, apikey) VALUES ('$username', '$password', '1', '$now', '$key')") or die(mysql_error());
+					mysql_query("INSERT INTO `serversessions` (`ip`, `username`, `loggedin`) VALUES ('$ip', '$username', '1')") or die(mysql_error());
+				}
+				onRegister($username);
 				$key = get_key($ip, $mode, $username);
 				echo json_encode(array("message" => "User registered", "status" => "OK", "username" => $username, "date" => $now, "loggedin" => true, "lastlogin" => $now, "apikey" => $key));
 			}
@@ -135,14 +146,16 @@ if(!versionCheck($version)){ // Version checking
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "LOGIN"){
-		// Login as a user
 		$username = clean($_POST['username']);
 		$password = clean($_POST['password']); // Encoded by plugin
 		if(valid($username) && valid($password)){
 			$query = mysql_query("SELECT id,lastlogin FROM users WHERE username='$username' AND password='$password'") or die(mysql_error());
 			if(mysql_num_rows($query)==1){
 				$last = mysql_result($query, 0, "lastlogin");
-				mysql_query("UPDATE users SET loggedin='1', lastlogin='$now' WHERE username='$username' LIMIT 1") or die(mysql_error());
+				if(!$debug){
+					mysql_query("UPDATE users SET loggedin='1', lastlogin='$now' WHERE username='$username' LIMIT 1") or die(mysql_error());
+					mysql_query("INSERT INTO `serversessions` (`ip`, `username`, `loggedin`) VALUES ('$ip', '$username', '1')") or die(mysql_error());
+				}
 				$key = get_key($ip, $mode, $username);
 				echo json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $last, "apikey" => $key));
 			}else{
@@ -152,19 +165,20 @@ if(!versionCheck($version)){ // Version checking
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "LOGOUT"){
-		// Logout 
 		$username = clean($_POST['username']);
 		// Check API key
 		check_key($ip, $mode, $key, $username);
 		if(valid($username)){
-			mysql_query("UPDATE users SET loggedin='0' WHERE username='$username' LIMIT 1") or die(mysql_error());
-			destroy_key($ip, $mode, $username);
+			if(!$debug){
+				mysql_query("UPDATE users SET loggedin='0' WHERE username='$username' LIMIT 1") or die(mysql_error());
+				mysql_query("UPDATE `serversessions` SET `loggedin`='0' WHERE `username`='$username' AND `ip`='$ip'") or die(mysql_error());
+				destroy_key($ip, $mode, $username);
+			}
 			echo json_encode(array("message" => "Logged out", "status" => "OK", "username" => $username));
 		}else{
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "CHECK_LOGIN"){
-		// "Auth Check", this is called by the plugin every so often to verify that the player is still logged in
 		$username = clean($_POST['username']);
 		// Check API key
 		check_key($ip, $mode, $key, $username);
@@ -172,17 +186,21 @@ if(!versionCheck($version)){ // Version checking
 			die(json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $now, "apikey" => null)));
 		}
 		if(valid($username)){
-			$query = mysql_query("SELECT id,lastlogin FROM users WHERE username='$username' AND loggedin='1'") or die(mysql_error());
+			$query = mysql_query("SELECT id,lastlogin,loggedin FROM users WHERE username='$username'") or die(mysql_error());
 			if(mysql_num_rows($query)==1){
 				$last = mysql_result($query, 0, "lastlogin");
-				mysql_query("UPDATE users SET loggedin='1', lastlogin='$now' WHERE username='$username' LIMIT 1") or die(mysql_error());
-				$key = get_key($ip, $mode, $username);
-				/*
-				============================= CRITICAL =============================
-				  xMail ignores the REAL logged in value of the user here!! FIX!!
-				============================= CRITICAL =============================				
-				*/
-				echo json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $last, "apikey" => $key));
+				$gLogin = mysql_result($query, 0, "loggedin");
+				$query = mysql_query("SELECT * FROM serversessions WHERE ip='$ip' AND username='$username' AND loggedin='1' LIMIT 1") or die(mysql_error());
+				if(mysql_num_rows($query)==1 || ($isOnlineMode && $gLogin==1)){
+					if(!$debug){
+						mysql_query("UPDATE users SET loggedin='1', lastlogin='$now' WHERE username='$username' LIMIT 1") or die(mysql_error());
+						mysql_query("UPDATE `serversessions` SET `loggedin`='1' WHERE `username`='$username' AND `ip`='$ip'") or die(mysql_error());
+					}
+					$key = get_key($ip, $mode, $username);
+					echo json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $last, "apikey" => $key));
+				}else{
+					echo json_encode(array("message" => "Invalid session", "status" => "ERROR", "username" => $username, "loggedin" => false));
+				}
 			}else{
 				echo json_encode(array("message" => "Incorrect username or password", "status" => "ERROR", "username" => $username, "loggedin" => false));
 			}
@@ -190,20 +208,16 @@ if(!versionCheck($version)){ // Version checking
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "INBOX"){
-		// Fetches the inbox
 		$username = clean($_POST['username']);
 		// Check API key
 		check_key($ip, $mode, $key, $username);
 		if(valid($username)){
-			// Check login
 			$query = mysql_query("SELECT id FROM users WHERE username='$username' AND loggedin='1'") or die(mysql_error());
-			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){ // Verify inbox
+			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){
 				$query = mysql_query("SELECT * FROM `mail` WHERE `to`='$username' AND `unread`='1'") or die(mysql_error());
 				if(mysql_num_rows($query)>0){
-					// Spit out basic details
 					echo json_encode(array("message" => "inbox", "status" => "OK", "username" => $username, "unread" => mysql_num_rows($query)));
 					while($array = mysql_fetch_array($query)){
-						// Gather information
 						$to = $array['to'];
 						$from = $array['from'];
 						$message = $array['message'];
@@ -229,13 +243,8 @@ if(!versionCheck($version)){ // Version checking
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
 						echo "\n".json_encode($mailMess);
-						/*
-						The new line is required because the plugin reads the first line as
-						the "basic info" line and any lines afterwards as "mail".
-						*/
 					}
 				}else{
-					// No mail
 					echo json_encode(array("message" => "no mail", "status" => "OK"));
 				}
 			}else{
@@ -245,20 +254,16 @@ if(!versionCheck($version)){ // Version checking
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "SENT"){
-		// Fetches the sent mail from a user
 		$username = clean($_POST['username']);
 		// Check API key
 		check_key($ip, $mode, $key, $username);
 		if(valid($username)){
-			// Check login
 			$query = mysql_query("SELECT id FROM users WHERE username='$username' AND loggedin='1'") or die(mysql_error());
-			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){ // Verify
+			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){
 				$query = mysql_query("SELECT * FROM `mail` WHERE `from`='$username'") or die(mysql_error());
 				if(mysql_num_rows($query)>0){
-					// Spit out basic details
 					echo json_encode(array("message" => "sent", "status" => "OK", "username" => $username, "messages" => mysql_num_rows($query)));
 					while($array = mysql_fetch_array($query)){
-						// Gather information
 						$to = $array['to'];
 						$from = $array['from'];
 						$message = $array['message'];
@@ -284,13 +289,8 @@ if(!versionCheck($version)){ // Version checking
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
 						echo "\n".json_encode($mailMess);
-						/*
-						The new line is required because the plugin reads the first line as
-						the "basic info" line and any lines afterwards as "mail".
-						*/
 					}
 				}else{
-					// No mail
 					echo json_encode(array("message" => "no mail", "status" => "OK"));
 				}
 			}else{
@@ -300,20 +300,16 @@ if(!versionCheck($version)){ // Version checking
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "READ"){
-		// Fetches the read mail of a user
 		$username = clean($_POST['username']);
 		// Check API key
 		check_key($ip, $mode, $key, $username);
 		if(valid($username)){
-			// Check login
 			$query = mysql_query("SELECT id FROM users WHERE username='$username' AND loggedin='1'") or die(mysql_error());
-			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){ // Verify
+			if(mysql_num_rows($query)==1 || strpos($username, 'CONSOLE@') !== false){
 				$query = mysql_query("SELECT * FROM `mail` WHERE `to`='$username' AND `unread`='0'") or die(mysql_error());
 				if(mysql_num_rows($query)>0){
-					// Spit out basic details
 					echo json_encode(array("message" => "read", "status" => "OK", "username" => $username, "read" => mysql_num_rows($query)));
 					while($array = mysql_fetch_array($query)){
-						// Gather information
 						$to = $array['to'];
 						$from = $array['from'];
 						$message = $array['message'];
@@ -339,13 +335,8 @@ if(!versionCheck($version)){ // Version checking
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
 						echo "\n".json_encode($mailMess);
-						/*
-						The new line is required because the plugin reads the first line as
-						the "basic info" line and any lines afterwards as "mail".
-						*/
 					}
 				}else{
-					// No mail
 					echo json_encode(array("message" => "no mail", "status" => "OK"));
 				}
 			}else{
@@ -355,14 +346,7 @@ if(!versionCheck($version)){ // Version checking
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "INFO"){
-		// Can be used to gather information about the server.
-		// message = server type 
-		// status = must be 'OK'
-		// version = the server version
-		// posturl = this page (almost useless)
-		// ip = the connecting IP
-		// now = the current server time, in seconds. See time() in the PHP manual for more info
-		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => XMAIL_SERVER_VERSION, "posturl" => $config["server.posturl"], "ip" => $ip, "now" => $now));
+		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => "XMAIL-1.1.1-OFFICIAL_SERVER", "posturl" => "http://xmail.turt2live.com/mail", "ip" => $ip, "now" => $now));
 	}else{
 		echo json_encode(array("message" => "Invalid Mode", "status" => "ERROR"));
 	}
