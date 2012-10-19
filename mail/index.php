@@ -88,7 +88,7 @@ if(!versionCheck($version)){
 					}
 					if(!isSpam($to, $from, $message)){
 						if(!$debug){
-							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `attachments`, `sent`) VALUES ('$to', '$from', '$message', '1', '1', '$attachments', '$now')") or die(mysql_error());
+							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `attachments`, `sent`, `sent_from`) VALUES ('$to', '$from', '$message', '1', '1', '$attachments', '$now', '$ip')") or die(mysql_error());
 						}
 						onComplexSend($to, $from, $message);
 						echo json_encode(array("message" => "Message sent!", "status" => "OK"));
@@ -225,6 +225,7 @@ if(!versionCheck($version)){
 						$complex = $array['complex'];
 						$id = $array['id'];
 						$unread = $array['unread'];
+						$sentfrom = $array['sent_from'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -242,6 +243,7 @@ if(!versionCheck($version)){
 						$mailMess["complex"] = $complex;
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
+						$mailMess["sentfrom"] = $sentfrom;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -271,6 +273,7 @@ if(!versionCheck($version)){
 						$complex = $array['complex'];
 						$id = $array['id'];
 						$unread = $array['unread'];
+						$sentfrom = $array['sent_from'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -288,6 +291,7 @@ if(!versionCheck($version)){
 						$mailMess["complex"] = $complex;
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
+						$mailMess["sentfrom"] = $sentfrom;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -317,6 +321,7 @@ if(!versionCheck($version)){
 						$complex = $array['complex'];
 						$id = $array['id'];
 						$unread = $array['unread'];
+						$sentfrom = $array['sent_from'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -334,6 +339,7 @@ if(!versionCheck($version)){
 						$mailMess["complex"] = $complex;
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
+						$mailMess["sentfrom"] = $sentfrom;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
