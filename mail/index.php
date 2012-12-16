@@ -13,7 +13,7 @@ mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql
 mysql_select_db($config["mysql.database"]) or die(mysql_error());
 
 function versionCheck($version){
-	$versions = array("1.0.0", "1.1.0", "1.1.1", "1.2.0-DEV", "IRC", "DesktopAPI");
+	$versions = array("1.0.0", "1.1.0", "1.1.1", "1.2.0", "1.3.0-SNAPSHOT", "IRC", "DesktopAPI");
 	$ip = $_SERVER['REMOTE_ADDR'];
 	if(in_array($version, $versions) || $ip == "68.151.211.33"){
 		return valid($version); 
@@ -63,15 +63,19 @@ if(!versionCheck($version)){
 		$to = clean($_POST['to']);
 		$from = clean($_POST['from']);
 		$message = clean($_POST['message']);
+		$pluginname = "xMail";
+		if(isset($_POST['pluginOwner'])){
+			$pluginname = clean($_POST['pluginOwner']);
+		}
 		$attachments = "";
 		// Check API key
 		check_key($ip, $mode, $key, $from);
-		if(valid($pid) && valid($uid) && valid($ident) && valid($to) && valid($from) && valid($message)){
+		if(valid($pid) && valid($uid) && valid($ident) && valid($to) && valid($from) && valid($message) && valid($pluginname)){
 			if(userExists($to)){
 				if($ident == "S"){
 					if(!isSpam($to, $from, $message)){
 						if(!$debug){
-							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `sent`, `sent_from`) VALUES ('$to', '$from', '$message', '1', '0', '$now', '$ip')") or die(mysql_error());
+							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `sent`, `sent_from`, `pluginname`) VALUES ('$to', '$from', '$message', '1', '0', '$now', '$ip', '$pluginname')") or die(mysql_error());
 						}
 						onSend($to, $from, $message);
 						echo json_encode(array("message" => "Message sent!", "status" => "OK"));
@@ -80,6 +84,7 @@ if(!versionCheck($version)){
 					}
 				}else if($ident == "C"){
 					$message = str_replace("&amp;", "&", $message);
+					$message = str_replace("&sect;", "?", $message);
 					$parts = explode(";", $message);
 					$message = $parts[0];
 					$attachments = "";
@@ -88,7 +93,7 @@ if(!versionCheck($version)){
 					}
 					if(!isSpam($to, $from, $message)){
 						if(!$debug){
-							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `attachments`, `sent`, `sent_from`) VALUES ('$to', '$from', '$message', '1', '1', '$attachments', '$now', '$ip')") or die(mysql_error());
+							mysql_query("INSERT INTO `mail` (`to`, `from`, `message`, `unread`, `complex`, `attachments`, `sent`, `sent_from`, `pluginname`) VALUES ('$to', '$from', '$message', '1', '1', '$attachments', '$now', '$ip', '$pluginname')") or die(mysql_error());
 						}
 						onComplexSend($to, $from, $message);
 						echo json_encode(array("message" => "Message sent!", "status" => "OK"));
@@ -226,6 +231,7 @@ if(!versionCheck($version)){
 						$id = $array['id'];
 						$unread = $array['unread'];
 						$sentfrom = $array['sent_from'];
+						$plugin = $array['pluginname'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -244,6 +250,7 @@ if(!versionCheck($version)){
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
 						$mailMess["sentfrom"] = $sentfrom;
+						$mailMess["pluginOwner"] = $plugin;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -274,6 +281,7 @@ if(!versionCheck($version)){
 						$id = $array['id'];
 						$unread = $array['unread'];
 						$sentfrom = $array['sent_from'];
+						$plugin = $array['pluginname'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -292,6 +300,7 @@ if(!versionCheck($version)){
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
 						$mailMess["sentfrom"] = $sentfrom;
+						$mailMess["pluginOwner"] = $plugin;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -322,6 +331,7 @@ if(!versionCheck($version)){
 						$id = $array['id'];
 						$unread = $array['unread'];
 						$sentfrom = $array['sent_from'];
+						$plugin = $array['pluginname'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -340,6 +350,7 @@ if(!versionCheck($version)){
 						$mailMess["attachments"] = $attachments;
 						$mailMess["unread"] = $unread;
 						$mailMess["sentfrom"] = $sentfrom;
+						$mailMess["pluginOwner"] = $plugin;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -353,6 +364,51 @@ if(!versionCheck($version)){
 		}
 	}else if($mode == "INFO"){
 		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => "XMAIL-1.1.1-OFFICIAL_SERVER", "posturl" => "http://xmail.turt2live.com/mail", "ip" => $ip, "now" => $now));
+	}else if($mode == "SETTINGS"){
+		if(valid($_POST['username'])){
+			$username = clean($_POST['username']);
+			$settings = array(
+				"welcomeMessage" => true,
+				"longWelcomeMessage" => true,
+				"newMessage" => true,
+				"longNewMessage" => true,
+				"mailboxLoading" => true,
+				"sentMessage" => true,
+				"loginMessage" => true,
+				"longLoginMessage" => true,
+				"folderLoadingMessage" => true,
+				"messageLoadingMessage" => true,
+				"loginStatusMessage" => true,
+				"markingAsReadMessage" => true,
+				"massSendStatusMessage" => true,
+				"alwaysAskMarkAsRead" => true,
+				"alwaysMarkAsRead" => true,
+				"username" => $username,
+				"message" => "Settings for $username",
+				"status" => "OK"
+			);
+			$query = mysql_query("SELECT * FROM usersettings WHERE username='$username'");
+			if(mysql_num_rows($query)>0){
+				if(mysql_result($query, 0, "showWelcomeMessage")=="CHECKED"){ $settings['welcomeMessage']=true; }else{ $settings['welcomeMessage']=false; }
+				if(mysql_result($query, 0, "showLongWelcomeMessage")=="CHECKED"){ $settings['longWelcomeMessage']=true; }else{ $settings['longWelcomeMessage']=false; }
+				if(mysql_result($query, 0, "showNewMessageAlert")=="CHECKED"){ $settings['newMessage']=true; }else{ $settings['newMessage']=false; }
+				if(mysql_result($query, 0, "showLongNewMessageAlert")=="CHECKED"){ $settings['longNewMessage']=true; }else{ $settings['longNewMessage']=false; }
+				if(mysql_result($query, 0, "showMailboxLoadMessage")=="CHECKED"){ $settings['mailboxLoading']=true; }else{ $settings['mailboxLoading']=false; }
+				if(mysql_result($query, 0, "showSentMessage")=="CHECKED"){ $settings['sentMessage']=true; }else{ $settings['sentMessage']=false; }
+				if(mysql_result($query, 0, "showLoginMessage")=="CHECKED"){ $settings['loginMessage']=true; }else{ $settings['loginMessage']=false; }
+				if(mysql_result($query, 0, "showLongLoginMessage")=="CHECKED"){ $settings['longLoginMessage']=true; }else{ $settings['longLoginMessage']=false; }
+				if(mysql_result($query, 0, "showFolderLoadingMessage")=="CHECKED"){ $settings['folderLoadingMessage']=true; }else{ $settings['folderLoadingMessage']=false; }
+				if(mysql_result($query, 0, "showMessageLoadinMessage")=="CHECKED"){ $settings['messageLoadingMessage']=true; }else{ $settings['messageLoadingMessage']=false; }
+				if(mysql_result($query, 0, "showLoginStatusMessage")=="CHECKED"){ $settings['loginStatusMessage']=true; }else{ $settings['loginStatusMessage']=false; }
+				if(mysql_result($query, 0, "showMarkingAsReadMessage")=="CHECKED"){ $settings['markingAsReadMessage']=true; }else{ $settings['markingAsReadMessage']=false; }
+				if(mysql_result($query, 0, "showMassSendStatusMessage")=="CHECKED"){ $settings['massSendStatusMessage']=true; }else{ $settings['massSendStatusMessage']=false; }
+				if(mysql_result($query, 0, "alwaysAskToMarkAsRead")=="CHECKED"){ $settings['alwaysAskMarkAsRead']=true; }else{ $settings['alwaysAskMarkAsRead']=false; }
+				if(mysql_result($query, 0, "alwaysMarkAsRead")=="CHECKED"){ $settings['alwaysMarkAsRead']=true; }else{ $settings['alwaysMarkAsRead']=false; }
+			}
+			echo json_encode($settings);
+		}else{
+			echo json_encode(array("message" => "Invalid arguments", "status" => "ERROR", "mode" => $mode));
+		}
 	}else{
 		echo json_encode(array("message" => "Invalid Mode", "status" => "ERROR"));
 	}
