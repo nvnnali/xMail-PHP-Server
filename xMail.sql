@@ -1,9 +1,9 @@
 -- phpMyAdmin SQL Dump
--- version 3.4.7.1
+-- version 3.4.11.1
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Oct 08, 2012 at 10:09 PM
+-- Generation Time: Dec 15, 2012 at 06:59 PM
 -- Server version: 5.1.56
 -- PHP Version: 5.2.6
 
@@ -17,7 +17,7 @@ SET time_zone = "+00:00";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Database: `xmail`
+-- Database: `xMail`
 --
 
 -- --------------------------------------------------------
@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS `mail` (
   `sent` text NOT NULL,
   `unread` tinyint(1) NOT NULL,
   `sent_from` text NOT NULL,
+  `pluginname` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
@@ -160,20 +161,6 @@ CREATE TABLE IF NOT EXISTS `snmail2` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `stats`
---
-
-CREATE TABLE IF NOT EXISTS `stats` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `key` text NOT NULL,
-  `value` text NOT NULL,
-  `time` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
-
--- --------------------------------------------------------
-
---
 -- Table structure for table `users`
 --
 
@@ -186,6 +173,33 @@ CREATE TABLE IF NOT EXISTS `users` (
   `lastlogin` text NOT NULL,
   `loggedin` tinyint(1) NOT NULL,
   `searchexempt` int(11) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `usersettings`
+--
+
+CREATE TABLE IF NOT EXISTS `usersettings` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `username` text NOT NULL,
+  `showWelcomeMessage` text NOT NULL,
+  `showLongWelcomeMessage` text NOT NULL,
+  `showNewMessageAlert` text NOT NULL,
+  `showLongNewMessageAlert` text NOT NULL,
+  `showMailboxLoadMessage` text NOT NULL,
+  `showSentMessage` text NOT NULL,
+  `showLoginMessage` text NOT NULL,
+  `showLongLoginMessage` text NOT NULL,
+  `showFolderLoadingMessage` text NOT NULL,
+  `showMessageLoadingMessage` text NOT NULL,
+  `showLoginStatusMessage` text NOT NULL,
+  `showMarkingAsReadMessage` text NOT NULL,
+  `showMassSendStatusMessage` text NOT NULL,
+  `alwaysAskToMarkAsRead` text NOT NULL,
+  `alwaysMarkAsRead` text NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=1 ;
 
