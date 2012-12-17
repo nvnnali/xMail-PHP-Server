@@ -1,7 +1,7 @@
 <?php
 // includes
-require_once "includes/constants.inc.php";
-require_once XMAIL_CONF_PATH;
+require_once "../inc/constants.inc.php";
+require_once XMAIL_CONF_PATH_SNAIL;
 require_once "includes/misc.inc.php";
 require_once "includes/keys.inc.php";
 require_once "includes/spamfilter.inc.php";
