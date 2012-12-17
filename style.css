@@ -3,6 +3,49 @@ body{
 	color: black;
 }
 
+code{
+	font-size: 15px;
+}
+
+.error{
+	background-color: #AB0000;
+	text-align: center;
+	width: 100%;
+	color: black;
+	font-size: 20px;
+	padding: 0;
+	margin: 0;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	font-weight: bold;
+}
+
+.success{
+	background-color: #61AB00;
+	text-align: center;
+	width: 100%;
+	color: black;
+	font-size: 20px;
+	padding: 0;
+	margin: 0;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	font-weight: bold;
+}
+
+.warning{
+	background-color: #DB8700;
+	text-align: center;
+	width: 100%;
+	color: black;
+	font-size: 20px;
+	padding: 0;
+	margin: 0;
+	padding-top: 6px;
+	padding-bottom: 6px;
+	font-weight: bold;
+}
+
 .wrapper{
 	width: 980px;
 	margin: auto;

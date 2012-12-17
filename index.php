@@ -32,6 +32,9 @@ include "inc/user.php";
 				</ul>
 			</div>
 			<div class='body'>
+				<?php
+				$alerts->displayAllAlerts(); // Display alerts
+				?>
 				<div class='post'>
 					<span class='title'>Welcome to xMail!</span>
 					<p class='content'>
