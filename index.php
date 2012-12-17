@@ -1,5 +1,6 @@
 <?php
 include "inc/user.php";
+include "inc/alerts.inc.php";
 ?>
 <html>
 <head>
