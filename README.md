@@ -34,6 +34,10 @@ Holds various function files for the snail mail and regular server mail
 
 The 'server mail' server files. index.php is the core, everything else is related to that file.
 
+#### /setup
+
+Files, such as the xMail.sql file, that are used in setup.
+
 #### /snail
 
 The 'snail mail' server files. index.php is the core, everything else is related to that file.
@@ -51,7 +55,7 @@ How to setup a working xMail PHP Server
 4. Save the file
 5. Upload the entire folder contents ('Desktop/xMail') to your website
 6. (OPTIONAL) Setup subdomains to point to 'xmail.yourwebsite.com'
-7. Create the xMail server database using the xMail.sql file provided
+7. Create the xMail server database using the xMail.sql file provided in the setup folder
 8. Create and schedule the cron jobs as defined in /cron/README.txt 
 9. Update the xMail-Plugin configuration (see below)
 10. Resolve any errors
