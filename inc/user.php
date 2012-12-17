@@ -24,6 +24,25 @@ function login($username, $password, $needsHash=true){
 	return mysql_num_rows($query)==1;
 }
 
+function register($username, $password, $cpassword, $needsHash=true){
+	if($needsHash){
+		$password = sha1($password);
+		$cpassword = sha1($cpassword);
+	}
+	if($password != $cpassword){
+		return 3;
+	}else{
+		$query = mysql_query("SELECT `id` FROM `users` WHERE `username`='{$username}'") or die(mysql_error());
+		if(mysql_num_rows($query)>0){
+			return 2;
+		}else{
+			$apikey = substr(sha1($username.time().$password), 0, 6);
+			mysql_query("INSERT INTO `users` (`username`, `password`, `apikey`, `loggedin`, `searchexempt`) VALUES ('{$username}', '{$password}', '{$apikey}', '0', '0')") or die(mysql_error());
+			return 1;
+		}
+	}
+}
+
 function isSearchExempt(){
 	if(mysql_num_rows(mysql_query("SELECT id FROM users WHERE username='".$_SESSION['username']."' AND searchexempt='1'"))>0){
 		return true;
