@@ -1,6 +1,27 @@
 <?php
+if(!defined('XMAIL_CONF_PATH')){
+	require_once("constants.inc.php");
+	require_once(XMAIL_CONF_PATH);
+}
+
+mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
+mysql_select_db($config["mysql.database"]) or die(mysql_error());
+
+session_start();
+
 function isLoggedIn(){
 	return isset($_SESSION['username']);
+}
+
+function login($username, $password, $needsHash=true){
+	if($needsHash){
+		$password = sha1($password);
+	}
+	$query = mysql_query("SELECT `id` FROM `users` WHERE `username`='{$username}' AND `password`='{$password}'") or die(mysql_error());
+	if(mysql_num_rows($query)==1){
+		$_SESSION['username'] = $username;
+	}
+	return mysql_num_rows($query)==1;
 }
 
 function isSearchExempt(){
