@@ -6,14 +6,6 @@ if(isLoggedIn()){
 	header("Location: mail.php?folder=inbox&success=You+are+already+logged+in");
 }
 
-$loginError = false;
-$errorMessage = "";
-
-if(isset($_GET['error'])){
-	$errorMessage = $_GET['error'];
-	$loginError = true;
-}
-
 // Login function
 if(isset($_POST['login']) && valid(clean($_POST['login']))){
 	$username = clean($_POST['username']);
