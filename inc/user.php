@@ -24,6 +24,21 @@ function login($username, $password, $needsHash=true){
 	return mysql_num_rows($query)==1;
 }
 
+function testLogin($username, $password, $needsHash=true){
+	if($needsHash){
+		$password = sha1($password);
+	}
+	$query = mysql_query("SELECT `id` FROM `users` WHERE `username`='{$username}' AND `password`='{$password}'") or die(mysql_error());
+	return mysql_num_rows($query)==1;
+}
+
+function changePassword($username, $newPassword, $needsHash=true){
+	if($needsHash){
+		$newPassword = sha1($newPassword);
+	}
+	mysql_query("UPDATE `users` SET `password`='{$newPassword}' WHERE `username`='{$username}' LIMIT 1") or die(mysql_error());
+}
+
 function register($username, $password, $cpassword, $needsHash=true){
 	if($needsHash){
 		$password = sha1($password);
@@ -43,8 +58,25 @@ function register($username, $password, $cpassword, $needsHash=true){
 	}
 }
 
+function getNumMailSent($username){
+	$rows = mysql_num_rows(mysql_query("SELECT `id` FROM `mail` WHERE `from`='{$username}'") or die(mysql_error()));
+	if(!isset($rows) || empty($rows)){
+		$rows = 0;
+	}
+	return $rows;
+}
+
+function getPercentOfSentRead($username){
+	$sent = getNumMailSent($username);
+	$read = mysql_num_rows(mysql_query("SELECT `id` FROM `mail` WHERE `from`='{$username}' AND `unread`='0'") or die(mysql_error()));
+	if($sent == 0){
+		return 100;
+	}
+	return round(($read/$sent)*100);
+}
+
 function isSearchExempt(){
-	if(mysql_num_rows(mysql_query("SELECT id FROM users WHERE username='".$_SESSION['username']."' AND searchexempt='1'"))>0){
+	if(mysql_num_rows(mysql_query("SELECT id FROM users WHERE username='".$_SESSION['username']."' AND searchexempt='1'") or die(mysql_error()))>0){
 		return true;
 	}
 	return false;
@@ -68,8 +100,8 @@ function getUnread(){
 
 function getAPIKey(){
 	if(isLoggedIn()){
-		$key = mysql_result(mysql_query("SELECT apikey FROM `users` WHERE username='".$_SESSION['username']."' LIMIT 1"), 0, "apikey");
-		$id =  mysql_result(mysql_query("SELECT id FROM `users` WHERE username='".$_SESSION['username']."' LIMIT 1"), 0, "id");
+		$key = mysql_result(mysql_query("SELECT apikey FROM `users` WHERE username='".$_SESSION['username']."' LIMIT 1") or die(mysql_error()), 0, "apikey");
+		$id =  mysql_result(mysql_query("SELECT id FROM `users` WHERE username='".$_SESSION['username']."' LIMIT 1") or die(mysql_error()), 0, "id");
 		if(strlen($key)<6){
 			$key = sha1($id.time().genAPIKey());
 			mysql_query("UPDATE users SET apikey='".$key."' WHERE `id`='$id'");
