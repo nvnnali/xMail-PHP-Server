@@ -1,5 +1,5 @@
 <?php
-include_once "inc/user.inc.php"; // For database connection
+require_once "inc/user.inc.php"; // For database connection
 
 function sendSimpleMail($to, $from, $message){
 	$now = time();
