@@ -11,6 +11,8 @@ Setup steps are below the folder breakdown. If you have any issues, please conta
 
 Intermediate PHP/SQL/Website knowledge is required in order to make this work. If you want a private server and do not have the skills needed, contact me in the IRC (#turt2live on EsperNet) and leave a message. I may not be there right away, if you need to leave, PM me your email so I can contact you later.
 
+**Live Demo** There is a live demo [here](http://turt2live.com/xmail2/), if you are interested. The demo is backed by [xmail.turt2live.com](http://xmail.turt2live.com).
+
 Folder Breakdown
 -----------------
 
@@ -78,7 +80,9 @@ This is all too complicated! What can I do?
 
 Contact me in my IRC channel (#turt2live on EsperNet). I may not respond right away, but leave your message anyways. If you decide you do not want to wait, PM me an email to reach you at.
 
-Web Interface?
---------------
+Web Interface
+-------------
 
-Soon. It will be basic.
+REALLY basic, I do suggest you update it yourself.
+
+**Live Demo** There is a live demo [here](http://turt2live.com/xmail2/), if you are interested. The demo is backed by [xmail.turt2live.com](http://xmail.turt2live.com).
