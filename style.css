@@ -128,3 +128,17 @@ code{
 	padding-top: 10px;
 	border-top: 1px solid #A3A3A3;
 }
+
+.composeto{
+	width: 200px;
+	height: 30px;
+	font-size: 17px;
+}
+
+.composemessage{
+	width: 450px;
+	height: 200px;
+	font-size: 17px;
+	display: block;
+	
+}
