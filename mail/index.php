@@ -13,7 +13,7 @@ mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql
 mysql_select_db($config["mysql.database"]) or die(mysql_error());
 
 function versionCheck($version){
-	$versions = array("1.0.0", "1.1.0", "1.1.1", "1.2.0", "1.3.0-SNAPSHOT", "IRC", "DesktopAPI");
+	$versions = array("1.0.0", "1.1.0", "1.1.1", "1.2.0", "1.3.0", "1.4.0", "1.5.0-SNAPSHOT", "IRC", "DesktopAPI");
 	$ip = $_SERVER['REMOTE_ADDR'];
 	if(in_array($version, $versions) || $ip == "68.151.211.33"){
 		return valid($version); 
@@ -363,7 +363,7 @@ if(!versionCheck($version)){
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "INFO"){
-		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => "XMAIL-1.1.1-OFFICIAL_SERVER", "posturl" => "http://xmail.turt2live.com/mail", "ip" => $ip, "now" => $now));
+		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => "XMAIL-CUSTOM_SERVER", "posturl" => "http://xmail.turt2live.com/mail", "ip" => $ip, "now" => $now, "timezone" => $config['timezone']));
 	}else if($mode == "SETTINGS"){
 		if(valid($_POST['username'])){
 			$username = clean($_POST['username']);
