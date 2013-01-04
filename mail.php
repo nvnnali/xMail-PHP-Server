@@ -123,6 +123,12 @@ if($query!=null && mysql_num_rows($query)>0){
 }else{
 	$mail = "No Mail!";
 }
+
+$s = "";
+if($allMail == 0 || $allMail > 1){
+	$s = "s";
+}
+$count = "{$allMail} message{$s}";
 ?>
 <html>
 <head>
@@ -164,7 +170,7 @@ if($query!=null && mysql_num_rows($query)>0){
 				$alerts->displayAllAlerts(); // Display alerts
 				?>
 				<div class='post'>
-					<span class='title'><?php echo $properFolderName; ?></span>
+					<span class='title'><?php echo $properFolderName." ({$count})"; ?></span>
 					<p class='content'>
 						<?php echo $mail; ?>
 					</p>
