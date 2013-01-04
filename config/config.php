@@ -6,4 +6,14 @@ $config["mysql.password"] 	= 'xmailpw';
 $config["mysql.database"] 	= 'xmaildb';
 
 $config["timezone"]         = 'America/Edmonton';
+
+// ##########################################################
+// # END CONFIGURATION      #=====#       END CONFIGURATION #
+// ##########################################################
+
+date_default_timezone_set($config["timezone"]);
+mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
+mysql_select_db($config["mysql.database"]) or die(mysql_error());
+
+session_start();
 ?>
