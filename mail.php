@@ -101,7 +101,7 @@ if($query!=null && mysql_num_rows($query)>0){
 		$mail .= "<div class='info'><p><b>To: </b>{$to}<br><b>From: </b>{$from}<br><b>Sent: </b>{$sent}<br><b>Time: </b>{$time}<br><br>";
 		if($folder == "inbox" || $folder == "read"){
 			if($complex){
-				$mail .= "<i>Go in-game to get read this mail, it has attachments!</i>";
+				$mail .= "<i>This message has attachments! Go in-game to mark this one as read/unread!</i>";
 			}else{
 				$mail .= "<form action='mail.php' method='post'>";
 				$mail .= "<input type='hidden' name='id' value='{$id}'>";
