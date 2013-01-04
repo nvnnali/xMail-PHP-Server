@@ -1,20 +1,24 @@
 <?php
-include_once "inc/user.php";
+include_once "inc/user.inc.php";
 include_once "inc/misc.inc.php";
 include_once "inc/alerts.inc.php";
 include_once "inc/mail.inc.php";
+
 if(!isLoggedIn()){
 	header("Location: login.php?error=Please+login+first");
 }
+
 $folder = strtolower(clean($_GET['folder']));
 if(!isset($folder) || empty($folder)){
 	$folder = "inbox";
 }
+
 $folders = array("inbox", "sent", "read");
 if(!in_array($folder, $folders)){
 	$alerts->setError("Unknown folder '{$folder}'! Using inbox...");
 	$folder = "inbox";
 }
+
 $properFolderName = ucfirst($folder);
 $alerts->setWarning("Mail not implemented");
 ?>

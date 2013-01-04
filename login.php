@@ -1,8 +1,9 @@
 <?php
-include_once "inc/user.php";
+include_once "inc/user.inc.php";
 include_once "inc/misc.inc.php";
 include_once "inc/alerts.inc.php";
 include_once "inc/mail.inc.php";
+
 if(isLoggedIn()){
 	header("Location: mail.php?folder=inbox&success=You+are+already+logged+in");
 }
