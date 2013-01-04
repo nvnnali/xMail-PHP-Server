@@ -1,12 +1,11 @@
 <?php
 // includes
-require_once "../inc/constants.inc.php";
-require_once XMAIL_CONF_PATH_SNAIL;
-require_once "includes/misc.inc.php";
-require_once "includes/keys.inc.php";
-require_once "includes/spamfilter.inc.php";
-require_once "../api/misc.inc.php";
-require_once "../inc/user.php";
+require_once "../config/config.php";
+require_once "../inc/misc.inc.php";
+require_once "../inc/keys.inc.php";
+require_once "../inc/spamfilter.inc.php";
+require_once "../inc/api.inc.php";
+require_once "../inc/user.inc.php";
 
 // You will need to change these values, most likely
 mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
