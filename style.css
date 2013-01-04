@@ -139,6 +139,40 @@ code{
 	width: 450px;
 	height: 200px;
 	font-size: 17px;
-	display: block;
-	
+	display: block;	
+}
+
+.mailmessage{
+	padding: 5px;
+	background: #D4D4D4;
+	width: 980px;
+	margin-bottom: 15px;
+}
+
+.mailmessage .info{
+	float: left;
+	width: 240px;
+	padding-right: 10px;
+	border-right: 1px solid #BFBFBF;
+}
+
+.mailmessage .message{
+	float: right;
+	width: 720px;
+}
+
+.mailmessage .mark{
+    background:none!important;
+    border:none; 
+    padding:0!important;
+    border-bottom:1px solid #444;
+}
+
+.mailmessage .mark:hover{
+	color: #858585;
+    border-bottom:1px solid #858585;
+}
+
+.clear{
+	clear: both;
 }

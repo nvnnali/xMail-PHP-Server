@@ -17,6 +17,7 @@ function sendComplexMail($to, $from, $message, $attachments = array()){
 	if(count($attachments)==0){
 		return sendSimpleMail($to, $from, $message);
 	}else{
+		// TODO: Complex mail sending
 		return false;
 	}
 }
