@@ -4,6 +4,8 @@ require_once "inc/misc.inc.php";
 require_once "inc/alerts.inc.php";
 require_once "inc/mail.inc.php";
 
+// TODO: API-ify this page
+
 if(!isLoggedIn()){
 	header("Location: login.php?error=Please+login+first");
 }
