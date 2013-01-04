@@ -1,7 +1,8 @@
 <?php
-include "inc/user.php";
-include "inc/misc.inc.php";
-include "inc/alerts.inc.php";
+include_once "inc/user.php";
+include_once "inc/misc.inc.php";
+include_once "inc/alerts.inc.php";
+include_once "inc/mail.inc.php";
 if(!isLoggedIn()){
 	header("Location: login.php?error=Please+login+first");
 }
