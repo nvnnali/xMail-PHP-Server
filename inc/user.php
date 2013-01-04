@@ -4,6 +4,7 @@ if(!defined('XMAIL_CONF_PATH')){
 	require_once(XMAIL_CONF_PATH);
 }
 
+date_default_timezone_set($config["timezone"]);
 mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
 mysql_select_db($config["mysql.database"]) or die(mysql_error());
 
