@@ -1,5 +1,7 @@
 <?php
-require_once("config/config.php");
+if(!defined("USER_INC_FROM")){
+	require_once("config/config.php");
+}
 
 function isLoggedIn(){
 	return isset($_SESSION['username']);

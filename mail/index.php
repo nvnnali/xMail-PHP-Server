@@ -1,5 +1,6 @@
 <?php
 // includes
+define("USER_INC_FROM", "mail");
 require_once "../config/config.php";
 require_once "../inc/misc.inc.php";
 require_once "../inc/keys.inc.php";
