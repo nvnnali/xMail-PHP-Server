@@ -53,7 +53,8 @@ function register($username, $password, $cpassword, $needsHash=true){
 }
 
 function getNumMailSent($username){
-	$rows = mysql_num_rows(mysql_query("SELECT `id` FROM `mail` WHERE `from`='{$username}'") or die(mysql_error()));
+    $query = mysql_query("SELECT `id` FROM `mail` WHERE `from`='{$username}'") or die(mysql_error());
+	$rows = mysql_num_rows($query);
 	if(!isset($rows) || empty($rows)){
 		$rows = 0;
 	}
@@ -62,7 +63,8 @@ function getNumMailSent($username){
 
 function getPercentOfSentRead($username){
 	$sent = getNumMailSent($username);
-	$read = mysql_num_rows(mysql_query("SELECT `id` FROM `mail` WHERE `from`='{$username}' AND `unread`='0'") or die(mysql_error()));
+    $query = mysql_query("SELECT `id` FROM `mail` WHERE `from`='{$username}' AND `unread`='0'") or die(mysql_error());
+	$read = mysql_num_rows($query);
 	if($sent == 0){
 		return 100;
 	}
