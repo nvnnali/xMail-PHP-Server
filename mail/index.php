@@ -409,6 +409,8 @@ if(!versionCheck($version)){
 		}else{
 			echo json_encode(array("message" => "Invalid arguments", "status" => "ERROR", "mode" => $mode));
 		}
+    }else if($mode == "AUTH_INFO"){
+			echo json_encode(array("message" => "Feature not supported", "status" => "OK"));
 	}else{
 		echo json_encode(array("message" => "Invalid Mode", "status" => "ERROR"));
 	}
