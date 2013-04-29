@@ -4,6 +4,9 @@ Keys functions for checking, creating, and removing keys
 */
 function check_key($ip, $mode, $key, $other=null){
 	// Check mode and console state for valid input
+    if($config["settings.nologin"]){
+        return true;
+    }
 	if($mode == "INBOX" || $mode == "LOGOUT" || $mode == "SEND" || $mode == "MARK"){
 		if(($mode == "SEND" || $mode == "INBOX" || $mode == "MARK") && strpos($other, 'CONSOLE@') !== false){
 			return true;

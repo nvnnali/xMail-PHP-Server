@@ -8,12 +8,8 @@ require_once "../inc/spamfilter.inc.php";
 require_once "../inc/api.inc.php";
 require_once "../inc/user.inc.php";
 
-// You will need to change these values, most likely
-mysql_connect($config["mysql.server"], $config["mysql.username"], $config["mysql.password"]) or die(mysql_error());
-mysql_select_db($config["mysql.database"]) or die(mysql_error());
-
 function versionCheck($version){
-	$versions = array("1.0.0", "1.1.0", "1.1.1", "1.2.0", "1.3.0", "1.4.0", "1.5.0", "1.5.1", "1.6.0-SNAPSHOT", "IRC", "DesktopAPI");
+	$versions = array("1.0.0", "1.1.0", "1.1.1", "1.2.0", "1.3.0", "1.4.0", "1.5.0", "1.5.1", "1.6.0", "1.7.0-SNAPSHOT", "IRC", "DesktopAPI");
 	$ip = $_SERVER['REMOTE_ADDR'];
 	if(in_array($version, $versions) || $ip == "68.151.211.33"){
 		return valid($version); 
@@ -27,14 +23,7 @@ $ip = $_SERVER['REMOTE_ADDR'];
 $version = clean($_POST['version']);
 $now = time();
 $debug = valid($_POST['debug']);
-$online = clean($_POST['onlineMode']);
-$isOnlineMode = false;
-
-if(valid($online)){
-	if($online == "online"){
-		$isOnlineMode = true;
-	}
-}
+$online = clean($_POST['onlineMode']); // Unused
 
 $vars = print_r($_REQUEST, true);
 $page = __FILE__;
@@ -154,6 +143,9 @@ if(!versionCheck($version)){
 		$username = clean($_POST['username']);
 		$password = clean($_POST['password']); // Encoded by plugin
 		if(valid($username) && valid($password)){
+            if($config["settings.nologin"]){
+                die(json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $now, "apikey" => null)));
+            }
 			$query = mysql_query("SELECT id,lastlogin FROM users WHERE username='$username' AND password='$password'") or die(mysql_error());
 			if(mysql_num_rows($query)==1){
 				$last = mysql_result($query, 0, "lastlogin");
@@ -187,7 +179,7 @@ if(!versionCheck($version)){
 		$username = clean($_POST['username']);
 		// Check API key
 		check_key($ip, $mode, $key, $username);
-		if(strpos($username, 'CONSOLE@') !== false){
+		if(strpos($username, 'CONSOLE@') !== false || $config["settings.nologin"]){
 			die(json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $now, "apikey" => null)));
 		}
 		if(valid($username)){
@@ -196,7 +188,7 @@ if(!versionCheck($version)){
 				$last = mysql_result($query, 0, "lastlogin");
 				$gLogin = mysql_result($query, 0, "loggedin");
 				$query = mysql_query("SELECT * FROM serversessions WHERE ip='$ip' AND username='$username' AND loggedin='1' LIMIT 1") or die(mysql_error());
-				if(mysql_num_rows($query)==1 || ($isOnlineMode && $gLogin==1)){
+				if(mysql_num_rows($query)==1 || $gLogin==1){
 					if(!$debug){
 						mysql_query("UPDATE users SET loggedin='1', lastlogin='$now' WHERE username='$username' LIMIT 1") or die(mysql_error());
 						mysql_query("UPDATE `serversessions` SET `loggedin`='1' WHERE `username`='$username' AND `ip`='$ip'") or die(mysql_error());
@@ -363,7 +355,7 @@ if(!versionCheck($version)){
 			echo json_encode(array("message" => "Unknown arguments", "status" => "ERROR", "mode" => $mode));
 		}
 	}else if($mode == "INFO"){
-		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => "XMAIL-CUSTOM_SERVER", "posturl" => "http://xmail.turt2live.com/mail", "ip" => $ip, "now" => $now, "timezone" => $config['timezone']));
+		echo json_encode(array("message" => "xMail PHP Server", "status" => "OK", "version" => "XMAIL-CUSTOM_SERVER", "posturl" => "http://xmail.turt2live.com/mail", "ip" => $ip, "now" => $now, "timezone" => $config['timezone'], "hasNoLogin" => $config["settings.nologin"]));
 	}else if($mode == "SETTINGS"){
 		if(valid($_POST['username'])){
 			$username = clean($_POST['username']);

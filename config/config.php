@@ -7,6 +7,8 @@ $config["mysql.database"] 	= 'xmaildb';
 
 $config["timezone"]         = 'America/Edmonton';
 
+$config["settings.nologin"] = false; // If true, external users do not need to login
+
 // ##########################################################
 // # END CONFIGURATION      #=====#       END CONFIGURATION #
 // ##########################################################
