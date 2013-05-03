@@ -143,9 +143,9 @@ if(!versionCheck($version)){
 		$username = clean($_POST['username']);
 		$password = clean($_POST['password']); // Encoded by plugin
 		if(valid($username) && valid($password)){
-            if($config["settings.nologin"]){
-                die(json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $now, "apikey" => null)));
-            }
+			if($config["settings.nologin"]){
+				die(json_encode(array("message" => "Logged in", "status" => "OK", "username" => $username, "loggedin" => true, "date" => $now, "lastlogin" => $now, "apikey" => null)));
+			}
 			$query = mysql_query("SELECT id,lastlogin FROM users WHERE username='$username' AND password='$password'") or die(mysql_error());
 			if(mysql_num_rows($query)==1){
 				$last = mysql_result($query, 0, "lastlogin");
@@ -224,6 +224,7 @@ if(!versionCheck($version)){
 						$unread = $array['unread'];
 						$sentfrom = $array['sent_from'];
 						$plugin = $array['pluginname'];
+						$sendtime = $array['sent'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -243,6 +244,7 @@ if(!versionCheck($version)){
 						$mailMess["unread"] = $unread;
 						$mailMess["sentfrom"] = $sentfrom;
 						$mailMess["pluginOwner"] = $plugin;
+						$mailMess["sendTime"] = $sendtime;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -274,6 +276,7 @@ if(!versionCheck($version)){
 						$unread = $array['unread'];
 						$sentfrom = $array['sent_from'];
 						$plugin = $array['pluginname'];
+						$sendtime = $array['sent'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -293,6 +296,7 @@ if(!versionCheck($version)){
 						$mailMess["unread"] = $unread;
 						$mailMess["sentfrom"] = $sentfrom;
 						$mailMess["pluginOwner"] = $plugin;
+						$mailMess["sendTime"] = $sendtime;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -324,6 +328,7 @@ if(!versionCheck($version)){
 						$unread = $array['unread'];
 						$sentfrom = $array['sent_from'];
 						$plugin = $array['pluginname'];
+						$sendtime = $array['sent'];
 						
 						// Make "plugin-readable" variables
 						if($complex == 1){
@@ -343,6 +348,7 @@ if(!versionCheck($version)){
 						$mailMess["unread"] = $unread;
 						$mailMess["sentfrom"] = $sentfrom;
 						$mailMess["pluginOwner"] = $plugin;
+						$mailMess["sendTime"] = $sendtime;
 						echo "\n".json_encode($mailMess);
 					}
 				}else{
@@ -401,7 +407,7 @@ if(!versionCheck($version)){
 		}else{
 			echo json_encode(array("message" => "Invalid arguments", "status" => "ERROR", "mode" => $mode));
 		}
-    }else if($mode == "AUTH_INFO"){
+	}else if($mode == "AUTH_INFO"){
 			echo json_encode(array("message" => "Feature not supported", "status" => "OK"));
 	}else{
 		echo json_encode(array("message" => "Invalid Mode", "status" => "ERROR"));
