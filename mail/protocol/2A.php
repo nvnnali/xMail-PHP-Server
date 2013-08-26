@@ -134,7 +134,7 @@ function attemptMail(){
         if(mysqli_num_rows($query)>0){
             $mail = array();
             $i = 0;
-            while($a = mysql_fetch_array($query)){
+            while($a = mysqli_fetch_array($query)){
                 $unread = $a['unread']==1;
                 $msg = array(
                     "to"=>$a['to'],
