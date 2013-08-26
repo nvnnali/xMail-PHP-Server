@@ -9,12 +9,6 @@ error_reporting(E_ALL ^ E_NOTICE);
 $sqlConn = mysqli_connect(constant("MYSQL_HOST"), constant("MYSQL_USERNAME"), constant("MYSQL_PASSWORD")) or die("Con Error: ".mysql_error());
 mysqli_select_db($sqlConn, constant("MYSQL_DATABASE")) or die("DB Error: ".mysql_error());
 
-function mysqli_result($res, $row, $field=0) {
-    $res->data_seek($row);
-    $datarow = $res->fetch_array();
-    return $datarow[$field];
-}
-
 // Records messages to a file
 function recordMessage($data){
     if(false){ // Log flag
