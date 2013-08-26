@@ -15,12 +15,12 @@ define("MYSQL_DATABASE", "xmail");
  Password Policy Settings:
 
  These settings allow for you, as an owner, to set the password
- policy. If any part of this policy is invalid xMail will default 
+ policy. If any part of this policy is invalid xMail will default
  to "SHA1, NO SALT". Supported methods are "sha1" and "md5". To
  use a different method, please open a request. Changing this after
  some accounts are created will NOT update passwords! This is to tell
  the xMail plugin (and other clients) what to send as a "password".
- 
+
  Again, THIS WILL NOT UPDATE THE DATABASE IF THIS IS CHANGED.
 */
 define("PASSWORD_POLICY", serialize(array(

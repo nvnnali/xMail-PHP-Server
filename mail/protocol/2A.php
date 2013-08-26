@@ -23,7 +23,7 @@ function handleMode($mode, $authPort, $authVersion){
     // TODO
     // Modes that do not need a validated connection can be placed in an if-elseif-else here
     if(strcmp($mode, "INFORMATION")==0){
-        
+
         $req = array();
         $req['password-policy'] = unserialize(constant("PASSWORD_POLICY"));
         $req['time'] = time();
@@ -34,7 +34,7 @@ function handleMode($mode, $authPort, $authVersion){
         $req['public-online-mode'] = $onlineMode;
         $req['supplied-minecraft-version'] = $authVersion;
         $req['supplied-auth-port'] = $authPort;
-        
+
         $ret = portReturnRequest($req);
         echo $ret;
         recordMessage($ret);
@@ -181,7 +181,7 @@ function attemptSendMail(){
             if(valid($to) && valid($from) && valid($date) && valid($ip) && valid($unread)){
                 $tags = json_encode($tags);
                 $tags = clean($tags);
-                
+
                 $attachments = json_encode($attachments);
                 $attachments = clean($attachments);
                 if(valid($tags) && valid($attachments)){
@@ -314,9 +314,9 @@ function checkBan(){
     $ip = $_SERVER['REMOTE_ADDR'];
     $banned = false;
     $isTemp = false;
-    
+
     // TODO: Check ban
-    
+
     if($banned){
         header("HTTP/1.0 403 Forbidden");
         echo json_encode(array("message"=>"Banned from xMail server", "temporary" => $isTemp));
@@ -329,8 +329,8 @@ function checkBan(){
 // as a second barrier for invalidated connections. This is considered the handshake.
 //
 // This is a random value that can be changed by any request (will add docs as to how a client should
-// handle the update as it could be appended to something like a mail message). Failure to send this 
-// will fail the handshake. Multiple attempts at requesting authentication to reset this code will 
+// handle the update as it could be appended to something like a mail message). Failure to send this
+// will fail the handshake. Multiple attempts at requesting authentication to reset this code will
 // force a temporary ban from the server
 function validateServerConnection(){
     global $sqlConn;

@@ -1,5 +1,5 @@
 <?php
-function startsWith($haystack, $needle){    
+function startsWith($haystack, $needle){
     return strpos($haystack, $needle) === 0;
 }
 function in_arrayi($needle, $haystack) {

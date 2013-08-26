@@ -14,17 +14,17 @@ function generateNewAuth($force=false){
             }else{*/
                 mysqli_query($sqlConn, "DELETE FROM `xmail_server_connections` WHERE `ip`='{$ip}' LIMIT 1") or die(mysqli_error($sqlConn));
             //}
-        }    
+        }
     }
-    
+
     $now = time();
-    
+
     $un = sha1(uniqid());
     $pw = sha1(uniqid());
     $se = sha1(uniqid());
-    
+
     mysqli_query($sqlConn, "INSERT INTO `xmail_server_connections` (`ip`,`username`,`password`,`secret`,`lastcheck`) VALUES ('{$ip}', '{$un}', '{$pw}', '{$se}', '{$now}')") or die(mysqli_error($sqlConn));
-        
+
     return array("username"=>$un, "password"=>$pw, "secret"=>$se);
 }
 

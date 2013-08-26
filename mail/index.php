@@ -9,11 +9,11 @@ error_reporting(E_ALL ^ E_NOTICE);
 $sqlConn = mysqli_connect(constant("MYSQL_HOST"), constant("MYSQL_USERNAME"), constant("MYSQL_PASSWORD")) or die("Con Error: ".mysql_error());
 mysqli_select_db($sqlConn, constant("MYSQL_DATABASE")) or die("DB Error: ".mysql_error());
 
-function mysqli_result($res, $row, $field=0) { 
-    $res->data_seek($row); 
-    $datarow = $res->fetch_array(); 
-    return $datarow[$field]; 
-} 
+function mysqli_result($res, $row, $field=0) {
+    $res->data_seek($row);
+    $datarow = $res->fetch_array();
+    return $datarow[$field];
+}
 
 // Records messages to a file
 function recordMessage($data){
@@ -23,17 +23,17 @@ function recordMessage($data){
 }
 
 // Used for header stuff
-if(!function_exists('getallheaders')){ 
-    function getallheaders(){ 
-        $headers = ''; 
-        foreach($_SERVER as $name => $value){ 
-            if(substr($name, 0, 5) == 'HTTP_'){ 
-                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value; 
-            } 
-        } 
-        return $headers; 
-    } 
-} 
+if(!function_exists('getallheaders')){
+    function getallheaders(){
+        $headers = '';
+        foreach($_SERVER as $name => $value){
+            if(substr($name, 0, 5) == 'HTTP_'){
+                $headers[str_replace(' ', '-', ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
+    }
+}
 
 // More headers
 function getRealHeaders(){
@@ -106,10 +106,10 @@ if(array_key_exists("XMAIL-REQUEST-AUTH", $headers)){
 }
 
 // Setup for authorization
-if(isset($_SERVER['HTTP_AUTHORIZATION'])) { 
-    $auth_params = explode(":" , base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6))); 
-    $_SERVER['PHP_AUTH_USER'] = $auth_params[0]; 
-    unset($auth_params[0]); 
+if(isset($_SERVER['HTTP_AUTHORIZATION'])) {
+    $auth_params = explode(":" , base64_decode(substr($_SERVER['HTTP_AUTHORIZATION'], 6)));
+    $_SERVER['PHP_AUTH_USER'] = $auth_params[0];
+    unset($auth_params[0]);
     $_SERVER['PHP_AUTH_PW'] = implode('',$auth_params);
 }
 
