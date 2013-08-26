@@ -19,43 +19,43 @@
          \ | /
          
          
-	by @shoghicp
+    by @shoghicp
 
 
 
-			DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-	TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
-	0. You just DO WHAT THE FUCK YOU WANT TO.
+    0. You just DO WHAT THE FUCK YOU WANT TO.
 
 
 */
 
 class CleverBot{
-	protected $client, $factory, $event, $instance;
-	
-	function __construct($client){
-		$this->client = $client;
-		$this->factory = new ChatterBotFactory();
-		$this->bot = $this->factory->create(ChatterBotType::CLEVERBOT);
-		$this->instance = array();
-		$this->event = $this->client->event("onChatHandler", "handler", $this);
-		console("[INFO] [CleverBot] Loaded");
-	}
-	
-	public function handler($data){
-		if($data["type"] === "private"){
-			if(!isset($this->instance[$data["owner"]])){
-				$this->instance[$data["owner"]] = $this->bot->createSession();
-			}
-			$this->client->say(html_entity_decode($this->instance[$data["owner"]]->think($data["message"])),$data["owner"]);
-		}
-	}
-	
-	
-	public function stop(){
-		$this->client->deleteEvent("onChatHandler", $this->event);
-	}
+    protected $client, $factory, $event, $instance;
+    
+    function __construct($client){
+        $this->client = $client;
+        $this->factory = new ChatterBotFactory();
+        $this->bot = $this->factory->create(ChatterBotType::CLEVERBOT);
+        $this->instance = array();
+        $this->event = $this->client->event("onChatHandler", "handler", $this);
+        console("[INFO] [CleverBot] Loaded");
+    }
+    
+    public function handler($data){
+        if($data["type"] === "private"){
+            if(!isset($this->instance[$data["owner"]])){
+                $this->instance[$data["owner"]] = $this->bot->createSession();
+            }
+            $this->client->say(html_entity_decode($this->instance[$data["owner"]]->think($data["message"])),$data["owner"]);
+        }
+    }
+    
+    
+    public function stop(){
+        $this->client->deleteEvent("onChatHandler", $this->event);
+    }
 
 
 }

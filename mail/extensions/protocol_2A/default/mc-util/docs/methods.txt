@@ -17,14 +17,14 @@
          \ | /
          
          
-	by @shoghicp
+    by @shoghicp
 
 
 
-			DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-	TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
-	0. You just DO WHAT THE FUCK YOU WANT TO.
+    0. You just DO WHAT THE FUCK YOU WANT TO.
 
 
 
@@ -33,30 +33,30 @@
 MinecraftClient methods:
 
 
-	object __construct(string $server [, int $protocol = CURRENT_PROTOCOL [, string $port = "25565"]])
-	void logout([string $message = "Quitting"])
-	array getInventory()
-	array getInvetorySlot(int $id)
-	array changeSlot(int $id)
-	void stop()
-	void process([string $stop = "ff"])
-	mixed response($eid)
-	int event(string $event, string $callback [, bool $inObject])
-	void action(int microseconds, string code)
-	void deleteEvent(string $event [, int $id = -1] )
-	array ping()
-	void say(string $message)
-	void move(float $x, float $y, float $z [, bool $ground = true])
-	void useEntity(int $eid [, bool $left = true])
-	void dropSlot()
-	void registerPluginChannel(string $channel)
-	void unregisterPluginChannel(string $channel)
-	void sendPluginMessage(string $channel, string $data)
-	void connect(string $user [, string $password = ""]) NO CODE IS EXECUTED AFTER THIS LINE. BE SURE TO CREATE EVENTS BEFORE THIS LINE
-	void activateSpout()
-	void sendSpoutMessage(int PID, int version, string data)
+    object __construct(string $server [, int $protocol = CURRENT_PROTOCOL [, string $port = "25565"]])
+    void logout([string $message = "Quitting"])
+    array getInventory()
+    array getInvetorySlot(int $id)
+    array changeSlot(int $id)
+    void stop()
+    void process([string $stop = "ff"])
+    mixed response($eid)
+    int event(string $event, string $callback [, bool $inObject])
+    void action(int microseconds, string code)
+    void deleteEvent(string $event [, int $id = -1] )
+    array ping()
+    void say(string $message)
+    void move(float $x, float $y, float $z [, bool $ground = true])
+    void useEntity(int $eid [, bool $left = true])
+    void dropSlot()
+    void registerPluginChannel(string $channel)
+    void unregisterPluginChannel(string $channel)
+    void sendPluginMessage(string $channel, string $data)
+    void connect(string $user [, string $password = ""]) NO CODE IS EXECUTED AFTER THIS LINE. BE SURE TO CREATE EVENTS BEFORE THIS LINE
+    void activateSpout()
+    void sendSpoutMessage(int PID, int version, string data)
 
 MapInterface methods
-	array block getBlock($x, $y, $z)
-	array blocks getZone($x1, $y1, $z1, $x2, $y2, $z2)
-	array blocks getRadius($x, $y, $z [, $radius = 4])
+    array block getBlock($x, $y, $z)
+    array blocks getZone($x1, $y1, $z1, $x2, $y2, $z2)
+    array blocks getRadius($x, $y, $z [, $radius = 4])

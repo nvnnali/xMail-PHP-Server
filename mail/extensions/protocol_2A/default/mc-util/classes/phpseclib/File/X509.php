@@ -2193,7 +2193,7 @@ class File_X509 {
             $serialNumber = !empty($this->serialNumber) ? $this->serialNumber : new Math_BigInteger();
 
             $this->currentCert = array(
-	        'tbsCertificate' =>
+            'tbsCertificate' =>
                     array(
                         'version' => 'v3',
                         'serialNumber' => $serialNumber, // $this->setserialNumber()
@@ -2244,9 +2244,9 @@ class File_X509 {
 
         if (isset($subject->domains) && count($subject->domains) > 1) {
             $this->currentCert['tbsCertificate']['extensions'][] = array(
-	        'extnId' => 'id-ce-subjectAltName',
-	        'critical' => false,
-	        'extnValue' => array()
+            'extnId' => 'id-ce-subjectAltName',
+            'critical' => false,
+            'extnValue' => array()
             );
             $last = count($this->currentCert['tbsCertificate']['extensions']) - 1;
             foreach ($subject->domains as $domain) {
@@ -2262,9 +2262,9 @@ class File_X509 {
             $this->removeExtension('id-ce-keyUsage');
 
             $this->currentCert['tbsCertificate']['extensions'][] = array(
-	        'extnId' => 'id-ce-keyUsage',
-	        'critical' => false,
-	        'extnValue' => array_values(array_unique(array_merge($keyUsage, array('cRLSign', 'keyCertSign'))))
+            'extnId' => 'id-ce-keyUsage',
+            'critical' => false,
+            'extnValue' => array_values(array_unique(array_merge($keyUsage, array('cRLSign', 'keyCertSign'))))
             );
 
             $basicConstraints = $this->getExtension('id-ce-basicConstraints');
@@ -2274,9 +2274,9 @@ class File_X509 {
             $this->removeExtension('id-ce-basicConstraints');
 
             $this->currentCert['tbsCertificate']['extensions'][] = array(
-	        'extnId' => 'id-ce-basicConstraints',
-	        'critical' => true,
-	        'extnValue' => array_unique(array_merge(array('cA' => true), $basicConstraints))
+            'extnId' => 'id-ce-basicConstraints',
+            'critical' => true,
+            'extnValue' => array_unique(array_merge(array('cA' => true), $basicConstraints))
             );
         }
 
@@ -2328,7 +2328,7 @@ class File_X509 {
             $this->currentCert['certificationRequestInfo']['subjectPKInfo'] = $publicKey;
         } else {
             $this->currentCert = array(
-	        'certificationRequestInfo' =>
+            'certificationRequestInfo' =>
                     array(
                         'version' => 'v1',
                         'subject' => $this->dn,

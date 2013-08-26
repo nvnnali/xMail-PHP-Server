@@ -19,36 +19,36 @@
          \ | /
          
          
-	by @shoghicp
+    by @shoghicp
 
 
 
-			DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
-	TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+            DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+    TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
-	0. You just DO WHAT THE FUCK YOU WANT TO.
+    0. You just DO WHAT THE FUCK YOU WANT TO.
 
 
 */
 
 
 function arg($name, $default){
-	global $arguments, $argv;
-	if(!isset($arguments)){
-		$arguments = arguments($argv);
-	}
-	
-	if(isset($arguments["commands"][$name])){
-		return $arguments["commands"][$name];
-	}else{
-		return $default;
-	}
+    global $arguments, $argv;
+    if(!isset($arguments)){
+        $arguments = arguments($argv);
+    }
+    
+    if(isset($arguments["commands"][$name])){
+        return $arguments["commands"][$name];
+    }else{
+        return $default;
+    }
 }
 
 function arguments ( $args ){
-	if(!is_array($args)){
-		$args = array();
-	}
+    if(!is_array($args)){
+        $args = array();
+    }
     array_shift( $args );
     $args = join( $args, ' ' );
 
@@ -104,31 +104,31 @@ function arguments ( $args ){
 }
 
 function console($message, $EOL = false, $log = true, $level = 1){
-	//global $path;
-	if(!defined("DEBUG") or DEBUG >= $level){
-		$message .= $EOL === true ? PHP_EOL:"";
-		//$message = date("H:i:s"). " ". $message;
-		if($log === true and (!defined("LOG") or LOG === true)){
-			logg($message, "console", false, $level);
-		}	
-		//echo $message; // Turt2Live - Shhhhhh
-	}
+    //global $path;
+    if(!defined("DEBUG") or DEBUG >= $level){
+        $message .= $EOL === true ? PHP_EOL:"";
+        //$message = date("H:i:s"). " ". $message;
+        if($log === true and (!defined("LOG") or LOG === true)){
+            logg($message, "console", false, $level);
+        }    
+        //echo $message; // Turt2Live - Shhhhhh
+    }
 }
 
 function logg($message, $name, $EOL = false, $level = 2, $close = false){
-	global $fpointers;
-	if((!defined("DEBUG") or DEBUG >= $level) and (!defined("LOG") or LOG === true)){
-		$message .= $EOL === true ? PHP_EOL:"";
-		if(!isset($fpointers)){
-			$fpointers = array();
-		}
-		if(!isset($fpointers[$name])){
-			$fpointers[$name] = fopen(FILE_PATH."/".$name.".log", "ab");
-		}
-		fwrite($fpointers[$name], $message);
-		if($close === true){
-			fclose($fpointers[$name]);
-			unset($fpointers[$name]);
-		}
-	}
+    global $fpointers;
+    if((!defined("DEBUG") or DEBUG >= $level) and (!defined("LOG") or LOG === true)){
+        $message .= $EOL === true ? PHP_EOL:"";
+        if(!isset($fpointers)){
+            $fpointers = array();
+        }
+        if(!isset($fpointers[$name])){
+            $fpointers[$name] = fopen(FILE_PATH."/".$name.".log", "ab");
+        }
+        fwrite($fpointers[$name], $message);
+        if($close === true){
+            fclose($fpointers[$name]);
+            unset($fpointers[$name]);
+        }
+    }
 }
