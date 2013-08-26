@@ -1,0 +1,99 @@
+
+
+
+           -
+         /   \
+      /         \
+   /   MINECRAFT   \
+/         PHP         \
+|\       CLIENT      /|
+|.   \     2     /   .|
+| ..     \   /     .. |
+|    ..    |    ..    |
+|       .. | ..       |
+\          |          /
+   \       |       /
+      \    |    /
+         \ | /
+         
+         
+	by @shoghicp
+
+
+
+			DO WHAT THE FUCK YOU WANT TO PUBLIC LICENSE
+	TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
+
+	0. You just DO WHAT THE FUCK YOU WANT TO.
+
+
+
+
+
+Events:
+
+
+	EVENT								DATA									DESCRIPTION
+	
+sent_[PID]							pdata									=> Fired when the packet PID is going to be sent
+recieved_[PID]						pdata									=> Triggered when recieved the packet PID
+onRecievedPacket					array(pid => PID, data => pdata)
+onSentPacket						array(pid => PID, data => pdata)
+onClose								message									=> Just before closing the client
+onChat								message
+onChatSent							message
+onTimeChange						time
+onTimeStateChange					state
+onDay								null
+onNight								null
+onSpawnChange						array coords
+onHealthChange						array(health => health, food => food)
+onDeath								null
+onRespawn							array data
+onMove								object Entity
+onPlayerSpawn						object Entity
+onEntitySpawn						object Entity
+onEntityMove						object Entity
+onEntityMove_[EID]					object Entity
+onEntityDespawn						EID
+onRainStart							time
+onRainStop							time
+onGamemodeChange					gamemode
+onThunderbolt						array(eid => eid, coords => coords)
+onInventorySlotChanged				array(slot => slot, data => sdata)
+onInventoryChanged					array inventory
+onConnect							null
+onUseEntity							array(eid => eid, left => left)
+onDropSlot							null
+onPluginMessage						array(channel => channel, data => data)
+onPluginMessage_[CHANNEL]			data => data
+onPluginChannelRegister				channel
+onPluginChannelRegister_[CHANNEL]	null
+onPluginChannelUnregister			channel
+onPluginChannelUnegister_[CHANNEL]	null
+onRecievedSpoutPacket_[PID]			array(version => version, data => data)
+onRecievedSpoutPacket				array(pid => PID, version => version, data => data)
+onSentSpoutPacket_[PID]				array(version => version, data => data)
+onSentSpoutPacket					array(pid => PID, version => version, data => data)
+onSpoutBlock						array(id => BID, data => data, name => name)
+onSpoutBlock_[BID]					array(data => data, name => name)
+onSpoutPlugins						array plugins
+onSpoutPreCacheCompleted			null
+onSpoutPermissions					array permissions
+onSpoutClipboard					text
+onSpoutWaypoint						array(coords => array coords, name => name, death => death)
+onSignUpdate						array(coords => array coords, text => text)
+onEntityAction_[ID]					object Entity
+onTick								time
+onPlayerPing						array(name => name, ping => ping)
+onPlayerPingRemove					name
+onEntityMetadataChange				object Entity
+onEntityMetadataChange_[EID]		object Entity
+
+
+Special events:
+
+onChatHandler						array info							=> Fired by plugin ChatHandler
+onChatCommand_[COMMAND]				array parameters					=> Fired by plugin ChatCommand
+onLagStart							null								=> Fired by plugin LagOMeter
+onLagEnd							time								=> Fired by plugin LagOMeter
