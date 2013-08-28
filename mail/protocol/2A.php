@@ -47,6 +47,8 @@ function handleMode($mode, $authPort, $authVersion){
             attemptRegister($onlineMode);
         }else if(strcmp($mode, "CHECK_LOGIN")==0){
             attemptCheckLogin($onlineMode);
+        }else if(strcmp($mode, "LOGOUT")==0){
+            attemptLogout($onlineMode);
         }else if(strcmp($mode, "MAIL")==0){
             attemptMail();
         }else if(strcmp($mode, "SEND")==0){
@@ -284,6 +286,7 @@ function attemptCheckLogin($onlineMode){
         header('HTTP/1.0 418 I\'m a teapot');
         echo portReturnRequest(array("message"=>"User logged in"));
         recordMessage("logged in - online mode");
+        die();
     }
     if(!array_key_exists("username", $_GET)){
         header("HTTP/1.0 406 Not Acceptable");
@@ -301,6 +304,26 @@ function attemptCheckLogin($onlineMode){
         echo portReturnRequest(array("message"=>"User not logged in"));
         recordMessage("not logged in");
     }
+}
+
+function attemptLogout($onlineMode){
+    global $sqlConn;
+    if($onlineMode){
+        header('HTTP/1.0 405 Method not allowed');
+        echo portReturnRequest(array("message"=>"Cannot log out of an online mode server"));
+        recordMessage("cannot log out - online mode");
+        die();
+    }
+    if(!array_key_exists("username", $_GET)){
+        header("HTTP/1.0 406 Not Acceptable");
+        echo json_encode(array("message"=>"Bad arguments"));
+        recordMessage("bad args");
+        die();
+    }
+    $username = clean($_GET['username']);
+    logoutUser($username);
+    echo portReturnRequest(array("message"=>"Logged out"));
+    recordMessage("not logged in (logout requested)");
 }
 
 // ban functions
