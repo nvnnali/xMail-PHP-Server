@@ -22,7 +22,7 @@ $sqlDb = mysqli_select_db($sqlCon, constant("USERS_MYSQL_DATABASE"));
 function isUser($name){
     global $sqlCon;
     $query = mysqli_query($sqlCon, "SELECT `".constant("USERS_USERNAME_COL")."` FROM `".constant("USERS_TABLE_NAME")."` WHERE `".constant("USERS_USERNAME_COL")."`='".$name."' LIMIT 1");
-    return mysql_num_rows($query)>0;
+    return mysqli_num_rows($query)>0;
 }
 
 function loginUser($name, $hashedPassword){
@@ -39,7 +39,12 @@ function loginUser($name, $hashedPassword){
 function registerUser($name, $hashedPassword){
     global $sqlCon;
     $ip = $_SERVER['REMOTE_ADDR'];
-    mysqli_query($sqlCon, "UPDATE `".constant("USERS_LOGIN_TABLE_NAME")."` SET `".constant("USERS_LOGGEDIN_COL")."`='0' WHERE `".constant("USERS_LOGIN_USERNAME_COL")."`='".$name."' AND `".constant("USERS_IP_COL")."`='".$ip."' LIMIT 1") or die(mysqli_error($sqlCon));
+	$query = mysqli_query("SELECT * FROM `".constant("USERS_TABLE_NAME")."` WHERE `".constant("USERS_USERNAME_COL")."`='".$name."'") or die(mysqli_error($sqlCon));
+	if(mysqli_num_rows($query)>0){
+		return false;
+	}
+	mysqli_query($sqlCon, "INSERT INTO `".constant("USERS_LOGIN_TABLE_NAME")."` (`".constant("USERS_LOGIN_USERNAME_COL")."`, `".constant("USERS_LOGGEDIN_COL")."`, `".constant("USERS_IP_COL")."`) VALUES ('".$name."', '1', '".$ip."')") or die(mysqli_error($sqlCon));
+	mysqli_query($sqlCon, "INSERT INTO `".constant("USERS_TABLE_NAME")."` (`".constant("USERS_USERNAME_COL")."`, `".constant("USERS_PASSWORD_COL")."`) VALUES ('".$name."', '".$hashedPassword."')");
     return true;
 }
 

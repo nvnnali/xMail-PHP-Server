@@ -4,22 +4,23 @@ require_once("extensions/protocol_2A/default/users.php");
 //require_once("extensions/protocol_2A/default/mc-util/minecraft.php");
 require_once("extensions/protocol_2A/default/onlineMode.php");
 
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
-// TODO: LOGOUT/SETTINGS/LETTERS
+// TODO: SETTINGS
+// TODO: SETTINGS
+// TODO: SETTINGS
+// TODO: SETTINGS
+// TODO: SETTINGS
+// TODO: SETTINGS
+// TODO: SETTINGS
+// TODO: SETTINGS
+// TODO: SETTINGS
 
 // TODO: fix online mode
 
 // A function to handle the mode
 function handleMode($mode, $authPort, $authVersion){
     $ip = $_SERVER['REMOTE_ADDR'];
-    $onlineMode = periodicOnlineMode($ip, $authPort, getProtocol($authVersion));
+    // TODO
+    $onlineMode = false;//periodicOnlineMode($ip, $authPort, getProtocol($authVersion));
     // TODO
     // Modes that do not need a validated connection can be placed in an if-elseif-else here
     if(strcmp($mode, "INFORMATION")==0){
@@ -55,10 +56,13 @@ function handleMode($mode, $authPort, $authVersion){
             attemptSendMail();
         }else if(strcmp($mode, "MARK_MAIL")==0){
             attemptMarkMail();
+        }else if(strcmp($mode, "PLAYER_SETTINGS")==0){
+            echo json_encode(array("message"=>"Not yet implemented"));
+            die();
         }else{
             header("HTTP/1.0 403 Forbidden");
-            echo json_encode(array("message"=>"Unknown mode. Is the protocol version correct?"));
-            recordMessage("Unknown mode");
+            echo json_encode(array("message"=>"Unknown mode. Is the protocol version correct?", "supplied-mode"=>$mode));
+            recordMessage("Unknown mode: ".$mode);
             die();
         }
     }
@@ -114,7 +118,7 @@ function attemptMail(){
     global $sqlConn;
     if(!array_key_exists("username", $_GET) || !array_key_exists("folder", $_GET)){
         header("HTTP/1.0 406 Not Acceptable");
-        echo json_encode(array("message"=>"Bad arguments"));
+        echo json_encode(array("message"=>"Bad arguments [1]"));
         recordMessage("bad args");
         die();
     }
