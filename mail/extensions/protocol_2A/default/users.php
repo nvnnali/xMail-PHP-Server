@@ -39,7 +39,7 @@ function loginUser($name, $hashedPassword){
 function registerUser($name, $hashedPassword){
     global $sqlCon;
     $ip = $_SERVER['REMOTE_ADDR'];
-	$query = mysqli_query("SELECT * FROM `".constant("USERS_TABLE_NAME")."` WHERE `".constant("USERS_USERNAME_COL")."`='".$name."'") or die(mysqli_error($sqlCon));
+	$query = mysqli_query($sqlCon, "SELECT * FROM `".constant("USERS_TABLE_NAME")."` WHERE `".constant("USERS_USERNAME_COL")."`='".$name."'") or die(mysqli_error($sqlCon));
 	if(mysqli_num_rows($query)>0){
 		return false;
 	}
